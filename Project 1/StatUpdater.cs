@@ -22,12 +22,13 @@ namespace MysticPets.Managers
 
             while (!token.IsCancellationRequested)
             {
-                foreach (var pet in petManager.GetAllPets())
+                var pet = petManager.ActivePet;
+                if (pet != null && !pet.IsDead())
                 {
                     pet.DecreaseStat(PetStat.Hunger, 1);
                     pet.DecreaseStat(PetStat.Sleep, 1);
                     pet.DecreaseStat(PetStat.Fun, 1);
-                    
+
                     if (pet.Sleep > 50 && pet.Fun > 50)
                     {
                         onCoinEarned?.Invoke();

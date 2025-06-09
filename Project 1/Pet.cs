@@ -25,15 +25,18 @@ namespace MysticPets.Pets
             {
                 case PetStat.Hunger:
                     Hunger = Math.Max(Hunger - amount, 0);
-                    if (Hunger <= 10 && Hunger > 0) Console.WriteLine($"⚠ WARNING: {Name}'s Hunger is critically low! ({Hunger})");
+                    if (Hunger <= 10 && Hunger > 0)
+                        Console.WriteLine($"⚠ WARNING: {Name}'s Hunger is critically low! ({Hunger})");
                     break;
                 case PetStat.Sleep:
                     Sleep = Math.Max(Sleep - amount, 0);
-                    if (Sleep <= 10 && Sleep > 0) Console.WriteLine($"⚠ WARNING: {Name}'s Sleep is critically low! ({Sleep})");
+                    if (Sleep <= 10 && Sleep > 0)
+                        Console.WriteLine($"⚠ WARNING: {Name}'s Sleep is critically low! ({Sleep})");
                     break;
                 case PetStat.Fun:
                     Fun = Math.Max(Fun - amount, 0);
-                    if (Fun <= 10 && Fun > 0) Console.WriteLine($"⚠ WARNING: {Name}'s Fun is critically low! ({Fun})");
+                    if (Fun <= 10 && Fun > 0)
+                        Console.WriteLine($"⚠ WARNING: {Name}'s Fun is critically low! ({Fun})");
                     break;
             }
 
@@ -41,6 +44,12 @@ namespace MysticPets.Pets
             {
                 PetDied?.Invoke(this);
             }
+        }
+
+        // ✅ Add this method so StatUpdater can safely check if the pet is dead
+        public bool IsDead()
+        {
+            return Hunger == 0 || Sleep == 0 || Fun == 0;
         }
     }
 }

@@ -13,10 +13,20 @@ namespace MysticPets
 {
     public class Game
     {
-        private PetManager petManager = new PetManager();
+        private Pet _activePet;
+
+        public Game(Pet pet)
+        {
+            _activePet = pet;
+        }
+
+        public Game()
+        {
+            
+        }
+        
+        private PetManager petManager = PetManager.Instance;
         private ItemManager itemManager = new ItemManager();
-        private CancellationTokenSource statUpdaterCts = new CancellationTokenSource();
-        private StatUpdater statUpdater;
         private int coinCount = 0;
         private bool hasAdopted = false;
         private DateTime lastFeedTime = DateTime.MinValue;
@@ -28,9 +38,20 @@ namespace MysticPets
         public void Start()
         {
             petManager.PetRemoved += OnPetRemoved;
-            statUpdater = new StatUpdater(petManager);
-            _ = statUpdater.StartStatDecreaseLoop(statUpdaterCts.Token, OnCoinEarned);
-            StartGameSequence();
+            petManager.StartStatUpdates(OnCoinEarned);
+
+            if (_activePet == null)
+            {
+                // No pet passed in → run normal adoption flow
+                StartGameSequence(); // this includes AdoptPet(), etc.
+            }
+            else
+            {
+                // A pet was passed in → skip adoption and go to gameplay
+                Console.Clear();
+                Console.WriteLine($"🐾 Welcome back, {_activePet.Name} the {_activePet.PetType}!");
+                RunPetLoop(_activePet);
+            }
         }
 
         public void Continue()
@@ -147,7 +168,9 @@ namespace MysticPets
                         OpenShop();
                         break;
                     case "5":
+                        petManager.StopStatUpdates(); // ✅ important!
                         return;
+
                     case "6":
                         ShowLiveStats().Wait();
                         break;
@@ -161,7 +184,7 @@ namespace MysticPets
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("\nYour pet is dead oh no!");
             Console.ResetColor();
-            statUpdaterCts.Cancel();
+            petManager.StopStatUpdates();
             Console.WriteLine("Press Enter to return to the main menu...");
             Console.ReadLine();
         }
@@ -169,6 +192,7 @@ namespace MysticPets
         private void AdoptPet(Pet pet)
         {
             petManager.AdoptPet(pet);
+            PetManager.Instance.SetActivePet(pet);
             Console.WriteLine($"\nYou have adopted {pet.GetName()} the {pet.PetType}!");
         }
 
@@ -371,6 +395,101 @@ namespace MysticPets
                 await Task.Delay(3000);
             }
         }
+private void RunPetLoop(Pet pet)
+{
+    while (!pet.IsDead())
+    {
+        Console.Clear();
+        DisplayPetAscii(pet);
+
+        Console.WriteLine(@"
+ _  _  ____  __ _  _  _ 
+( \/ )(  __)(  ( \/ )( \
+/ \/ \ ) _) /    /) \/ (
+\_)(_/(____)\_)__)\____/                      
+");
+        Console.WriteLine("1. Feed");
+        Console.WriteLine("2. Play");
+        Console.WriteLine("3. Sleep");
+        Console.WriteLine("4. Shop");
+        Console.WriteLine("5. Exit to Main Menu");
+        Console.WriteLine("6. View Stats (Live)");
+        Console.WriteLine($"\nCurrent Coins: {coinCount}");
+        Console.Write("\nChoose an action: ");
+        string input = Console.ReadLine();
+
+        switch (input)
+        {
+            case "1":
+                if (DateTime.Now - lastFeedTime < actionCooldown)
+                {
+                    Console.WriteLine("⏳ You need to wait before feeding again.");
+                    Console.ReadLine();
+                }
+                else
+                {
+                    FeedPet();
+                    lastFeedTime = DateTime.Now;
+                }
+                break;
+
+            case "2":
+                if (DateTime.Now - lastPlayTime < actionCooldown)
+                {
+                    Console.WriteLine("⏳ You need to wait before playing again.");
+                    Console.ReadLine();
+                }
+                else
+                {
+                    pet.IncreaseFun(10);
+                    lastPlayTime = DateTime.Now;
+                }
+                break;
+
+            case "3":
+                if (DateTime.Now - lastSleepTime < actionCooldown)
+                {
+                    Console.WriteLine("⏳ You need to wait before sleeping again.");
+                    Console.ReadLine();
+                }
+                else
+                {
+                    pet.IncreaseSleep(10);
+                    lastSleepTime = DateTime.Now;
+                }
+                break;
+
+            case "4":
+                OpenShop();
+                break;
+
+            case "5":
+                petManager.StopStatUpdates();
+                return;
+
+                return;
+
+            case "6":
+                ShowLiveStats().Wait();
+                break;
+
+            default:
+                Console.WriteLine("Invalid choice. Press Enter to try again.");
+                Console.ReadLine();
+                break;
+        }
+    }
+
+    Console.ForegroundColor = ConsoleColor.Red;
+    Console.WriteLine("\nYour pet is dead oh no!");
+    Console.ResetColor();
+    petManager.StopStatUpdates();
+    Console.WriteLine("Press Enter to return to the main menu...");
+    Console.ReadLine();
+    petManager.StopStatUpdates();
+ 
+
+}
 
 
         private void OnCoinEarned()
