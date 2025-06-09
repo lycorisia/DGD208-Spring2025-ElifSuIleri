@@ -19,6 +19,11 @@ namespace MysticPets
         private StatUpdater statUpdater;
         private int coinCount = 0;
         private bool hasAdopted = false;
+        private DateTime lastFeedTime = DateTime.MinValue;
+        private DateTime lastPlayTime = DateTime.MinValue;
+        private DateTime lastSleepTime = DateTime.MinValue;
+        private readonly TimeSpan actionCooldown = TimeSpan.FromSeconds(3);
+
 
         public void Start()
         {
@@ -40,6 +45,7 @@ namespace MysticPets
                 Console.Clear();
                 Console.WriteLine("Welcome to the MysticPets Adoption Centre!");
                 Console.WriteLine("I am Liex, I will be your helper today.");
+                Console.WriteLine("Let's go and find your perfect Mystical Pet!.");
                 Console.WriteLine("\nChoose the type of pet you want to adopt:");
 
                 Console.WriteLine("1. Pixie");
@@ -102,13 +108,40 @@ namespace MysticPets
                 switch (input)
                 {
                     case "1":
-                        FeedPet();
+                        if (DateTime.Now - lastFeedTime < actionCooldown)
+                        {
+                            Console.WriteLine("⏳ You need to wait before feeding again.");
+                            Console.ReadLine();
+                        }
+                        else
+                        {
+                            FeedPet();
+                            lastFeedTime = DateTime.Now;
+                        }
                         break;
                     case "2":
-                        petManager.GetAllPets().First().IncreaseFun(10);
+                        if (DateTime.Now - lastPlayTime < actionCooldown)
+                        {
+                            Console.WriteLine("⏳ You need to wait before playing again.");
+                            Console.ReadLine();
+                        }
+                        else
+                        {
+                            petManager.GetAllPets().First().IncreaseFun(10);
+                            lastPlayTime = DateTime.Now;
+                        }
                         break;
                     case "3":
-                        petManager.GetAllPets().First().IncreaseSleep(10);
+                        if (DateTime.Now - lastSleepTime < actionCooldown)
+                        {
+                            Console.WriteLine("⏳ You need to wait before sleeping again.");
+                            Console.ReadLine();
+                        }
+                        else
+                        {
+                            petManager.GetAllPets().First().IncreaseSleep(10);
+                            lastSleepTime = DateTime.Now;
+                        }
                         break;
                     case "4":
                         OpenShop();
@@ -207,11 +240,12 @@ namespace MysticPets
         {
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine($"\n!!! ALERT: {pet.GetName()} the {pet.PetType} has passed away...");
-            Console.WriteLine("Your pet is dead oh no!");
+            Console.WriteLine($"Rest in Peace, {pet.GetName()}.");
             Console.ResetColor();
             Console.WriteLine("Press Enter to continue...");
             Console.ReadLine();
         }
+
 
         private async Task ShowLiveStats()
         {
@@ -314,7 +348,22 @@ namespace MysticPets
                         Console.Write($"{pet.GetName()} ");
                         Console.ResetColor();
                         Console.WriteLine($"({pet.PetType}) - Hunger: {pet.Hunger} | Sleep: {pet.Sleep} | Fun: {pet.Fun}");
+
+                        List<string> lowStats = new();
+
+                        if (pet.Hunger < 10) lowStats.Add("Hunger");
+                        if (pet.Sleep < 10) lowStats.Add("Sleep");
+                        if (pet.Fun < 10) lowStats.Add("Fun");
+
+                        if (lowStats.Count > 0)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Yellow;
+                            Console.WriteLine($"⚠ WARNING: Low {string.Join(", ", lowStats)}");
+                            Console.ResetColor();
+                        }
+
                     }
+
                 }
 
                 Console.WriteLine($"\nTotal Coins: {coinCount}");
