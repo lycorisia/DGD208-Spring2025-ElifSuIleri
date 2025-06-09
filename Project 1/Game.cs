@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using MysticPets.Enums;
 using MysticPets.Managers;
 using MysticPets.Pets;
 using MysticPets.Items;
@@ -79,13 +80,14 @@ namespace MysticPets
             while (!petManager.GetAllPets().First().IsDead())
             {
                 Console.Clear();
+                var pet = petManager.GetAllPets().First();
+                DisplayPetAscii(pet);
+
                 Console.WriteLine(@"
- __  __                  
-|  \/  |                 
-| \  / | ___ _ __  _   _ 
-| |\/| |/ _ \ '_ \| | | |
-| |  | |  __/ | | | |_| |
-|_|  |_|\___|_| |_|\__,_|                       
+ _  _  ____  __ _  _  _ 
+( \/ )(  __)(  ( \/ )( \
+/ \/ \ ) _) /    /) \/ (
+\_)(_/(____)\_)__)\____/                      
 ");
                 Console.WriteLine("1. Feed");
                 Console.WriteLine("2. Play");
@@ -224,6 +226,73 @@ namespace MysticPets
 
             await statsTask;
         }
+        private void DisplayPetAscii(Pet pet)
+        {
+            Console.WriteLine();
+
+            switch (pet.PetType)
+            {
+                case PetType.Pixie:
+                    Console.WriteLine(@"
+.'.         .'.
+|  \       /  |
+'.  \  |  /  .'
+  '. \\|// .'
+    '-- --'
+    .'/|\'.
+   '..'|'..'                     
+");
+                    break;
+                case PetType.Hydra:
+                    Console.WriteLine(@"
+ .             _.--._       /|
+        .    .'()..()`.    / /
+            ( `-.__.-' )  ( (    .
+   .         \        /    \ \
+       .      \      /      ) )        .
+            .' -.__.- `.-.-'_.'
+ .        .'  /-____-\  `.-'       .
+          \  /-.____.-\  /-.
+           \ \`-.__.-'/ /\|\|           .
+          .'  `.    .'  `.
+          |/\/\|    |/\/\|                   
+");
+                    break;
+                case PetType.Dragon:
+                    Console.WriteLine(@"
+            \||/
+                |  @___oo
+      /\  /\   / (__,,,,|
+     ) /^\) ^\/ _)
+     )   /^\/   _)
+     )   _ /  / _)
+ /\  )/\/ ||  | )_)
+<  >      |(,,) )__)
+ ||      /    \)___)\
+ | \____(      )___) )___
+  \______(_______;;; __;;;                     
+");
+                    break;
+                case PetType.Unicorn:
+                    Console.WriteLine(@"
+       /
+               ,.. /
+             ,'   ';
+  ,,.__    _,' /';  .
+ :','  ~~~~    '. '~
+:' (   )         )::,
+'. '. .=----=..-~  .;'
+ '  ;'  ::   ':.  '""
+   (:   ':    ;)
+    \\   '""  ./
+     '""      '""                     
+");
+                    break;
+            }
+
+            Console.WriteLine();
+        }
+
 
         private async Task DisplayPetStatsLoop(CancellationToken token)
         {
