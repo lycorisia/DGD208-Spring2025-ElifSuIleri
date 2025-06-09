@@ -48,24 +48,28 @@ namespace MysticPets
 
                 var choice = Console.ReadLine();
 
+                Console.Write("\nGive your new pet a name: ");
+                string petName = Console.ReadLine()?.Trim();
+
                 switch (choice)
                 {
                     case "1":
-                        AdoptPet(new Pixie("Pixie"));
+                        AdoptPet(new Pixie(petName));
                         break;
                     case "2":
-                        AdoptPet(new Hydra("Hydra"));
+                        AdoptPet(new Hydra(petName));
                         break;
                     case "3":
-                        AdoptPet(new Dragon("Dragon"));
+                        AdoptPet(new Dragon(petName));
                         break;
                     case "4":
-                        AdoptPet(new Unicorn("Unicorn"));
+                        AdoptPet(new Unicorn(petName));
                         break;
                     default:
                         Console.WriteLine("Invalid choice.");
                         return;
                 }
+
 
                 hasAdopted = true;
                 Console.WriteLine("\nPress Enter to continue...");
@@ -75,7 +79,14 @@ namespace MysticPets
             while (!petManager.GetAllPets().First().IsDead())
             {
                 Console.Clear();
-                Console.WriteLine("=== MysticPets In-Game Menu ===\n");
+                Console.WriteLine(@"
+ __  __                  
+|  \/  |                 
+| \  / | ___ _ __  _   _ 
+| |\/| |/ _ \ '_ \| | | |
+| |  | |  __/ | | | |_| |
+|_|  |_|\___|_| |_|\__,_|                       
+");
                 Console.WriteLine("1. Feed");
                 Console.WriteLine("2. Play");
                 Console.WriteLine("3. Sleep");
@@ -230,7 +241,10 @@ namespace MysticPets
                 {
                     foreach (var pet in pets)
                     {
-                        Console.WriteLine($"{pet.GetName()} ({pet.PetType}) - Hunger: {pet.Hunger} | Sleep: {pet.Sleep} | Fun: {pet.Fun}");
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.Write($"{pet.GetName()} ");
+                        Console.ResetColor();
+                        Console.WriteLine($"({pet.PetType}) - Hunger: {pet.Hunger} | Sleep: {pet.Sleep} | Fun: {pet.Fun}");
                     }
                 }
 
@@ -239,6 +253,7 @@ namespace MysticPets
                 await Task.Delay(3000);
             }
         }
+
 
         private void OnCoinEarned()
         {

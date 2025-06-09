@@ -88,10 +88,10 @@ namespace MysticPets.UI
         private void ShowProjectInfo()
         {
             Console.Clear();
-            Console.WriteLine("MysticPets – A virtual pet simulation game created for DGD208 Game Programming by Elif Su İleri.");
+            Console.WriteLine("MysticPets – A virtual pet care simulation game created for DGD208 Game Programming by Elif Su İleri - 2305041041.");
             Console.WriteLine("Take care of magical pets by feeding, playing, and letting them sleep. Earn coins, buy items, and keep your pet alive");
-            Console.WriteLine("Earn coins, buy items, and keep your pet alive!");
-            Console.WriteLine("\nCredits: r/csharp, Chat GPT, hhhhertz and ApexNebulae on x/Twitter and Olcay Kalyoncuoğlu's Class on C# at Udemy.com");
+            Console.WriteLine("And don't you dare let them die");
+            Console.WriteLine("\nCredits: r/csharp, Chat GPT (Sadly), hhhhertz and ApexNebulae on x/Twitter, Microsoft's C# Tutorials and Olcay Kalyoncuoğlu's Class on C# at Udemy.com");
             Console.ReadKey();
         }
     }
